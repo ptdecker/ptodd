@@ -2,3 +2,9 @@ name: ptodd
 channels:
   - defaults
 prefix: /Users/todddecker/opt/miniconda3/envs/ptodd
+dependencies:
+  - python=3.9.13
+  - pip=22.2.2
+  - pip:
+    - flask==2.2.2
+
