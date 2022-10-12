@@ -1,0 +1,4 @@
+name: ptodd
+channels:
+  - defaults
+prefix: /Users/todddecker/opt/miniconda3/envs/ptodd
