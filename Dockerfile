@@ -1,15 +1,15 @@
-FROM python:3.9.14-bullseye
+FROM python:latest
 
-ENV FLASK_APP hello.py
+#ENV FLASK_APP hello.py
 
-RUN adduser -D ptodd
+RUN adduser --disabled-password ptodd
 USER ptodd
 
 WORKDIR /home/ptodd
 
-COPY environment.yml
+#COPY environment.yml environment.yml
 
-COPY hello,py boot.sh ./
+#COPY hello.py hello.py
 
-EXPOSE 5000
+#EXPOSE 5000
 
