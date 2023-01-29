@@ -8,12 +8,15 @@ use std::{
 };
 
 fn main() {
-    let listener = TcpListener::bind("127.0.0.1:6502").unwrap();
+    let addr = "127.0.0.1:6502";
+    let listener = TcpListener::bind(addr).unwrap();
     let pool = ThreadPool::new(4);
+    println!("Listening for connections on {}.", addr);
     for stream in listener.incoming() {
         let stream = stream.unwrap();
         pool.execute(|| handle_connection(stream));
     }
+    println!("Shutting down.");
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -23,7 +26,7 @@ fn handle_connection(mut stream: TcpStream) {
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
-    println!("Request: {:#?}", http_request);
+    println!("Request ({:?}): {:#?}", stream.peer_addr().unwrap(), http_request);
     let (status_line, filename) = match http_request[0].as_str() {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),
         "GET /sleep HTTP/1.1" => {
