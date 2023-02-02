@@ -26,7 +26,11 @@ fn handle_connection(mut stream: TcpStream) {
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
-    println!("Request ({:?}): {:#?}", stream.peer_addr().unwrap(), http_request);
+    println!(
+        "Request ({:?}): {:#?}",
+        stream.peer_addr().unwrap(),
+        http_request
+    );
     let (status_line, filename) = match http_request[0].as_str() {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),
         "GET /sleep HTTP/1.1" => {
