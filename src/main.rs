@@ -10,7 +10,7 @@ use std::{
 fn main() {
     let addr = "127.0.0.1:6502";
     let listener = TcpListener::bind(addr).unwrap();
-    let pool = ThreadPool::new(4);
+    let pool = ThreadPool::build(4).unwrap();
     println!("Listening for connections on {}.", addr);
     for stream in listener.incoming() {
         let stream = stream.unwrap();
