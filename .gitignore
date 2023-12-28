@@ -1,7 +1,4 @@
-bhbackup/
-.vscode
-
-
-# Added by cargo
-
+/bhbackup
+/.vscode
+.idea
 /target

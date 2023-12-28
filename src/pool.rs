@@ -1,3 +1,5 @@
+//! Basic Thread Pool Implementation
+use log::debug;
 use std::{
     fmt,
     sync::{mpsc, Arc, Mutex},
@@ -21,15 +23,17 @@ impl ThreadPool {
     ///
     /// `new` will panic if the requested size of the pool is not greater than 1
     ///
-    pub fn build(size: usize) -> Result<ThreadPool, PoolCreationError> {
+    pub fn build(size: usize) -> Result<ThreadPool, Error> {
         if size == 0 {
-            return Err(PoolCreationError);
+            return Err(Error::Channel(
+                "Cannot create a zero sized thread pool".to_string(),
+            ));
         }
         let (sender, receiver) = mpsc::channel();
         let receiver = Arc::new(Mutex::new(receiver));
         let mut workers = Vec::with_capacity(size);
         for id in 0..size {
-            workers.push(Worker::new(id, Arc::clone(&receiver)));
+            workers.push(Worker::new(id, Arc::clone(&receiver))?);
         }
         Ok(ThreadPool {
             workers,
@@ -37,12 +41,18 @@ impl ThreadPool {
         })
     }
 
-    pub fn execute<F>(&self, f: F)
+    pub fn execute<F>(&self, f: F) -> Result<(), Error>
     where
         F: FnOnce() + Send + 'static,
     {
         let job = Box::new(f);
-        self.sender.as_ref().unwrap().send(job).unwrap();
+        self.sender
+            .as_ref()
+            .ok_or(Error::Channel(
+                "expected 'sender' channel was 'None'".to_string(),
+            ))?
+            .send(job)?;
+        Ok(())
     }
 }
 
@@ -50,9 +60,9 @@ impl Drop for ThreadPool {
     fn drop(&mut self) {
         drop(self.sender.take());
         for worker in &mut self.workers {
-            println!("Shutting down worker {}", worker.id);
+            debug!("Shutting down worker {}", worker.id);
             if let Some(thread) = worker.thread.take() {
-                thread.join().unwrap();
+                thread.join().expect("unable to join associated thread");
             }
         }
     }
@@ -65,37 +75,45 @@ struct Worker {
 }
 
 impl Worker {
-    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Result<Worker, Error> {
         let thread = thread::spawn(move || loop {
-            let message = receiver.lock().unwrap().recv();
+            let message = receiver
+                .lock()
+                .expect("unable to lock spawned thread")
+                .recv();
             match message {
                 Ok(job) => {
-                    println!("Worker {id} got a job; executing.");
+                    debug!("Worker {id} got a job; executing.");
                     job();
                 }
                 Err(_) => {
-                    println!("Worker {id} shutting down.");
+                    debug!("Worker {id} shutting down.");
                     break;
                 }
             }
         });
-        Worker {
+        Ok(Worker {
             id,
             thread: Some(thread),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum Error {
+    Channel(String),
+}
+
+impl<T> From<mpsc::SendError<T>> for Error {
+    fn from(err: mpsc::SendError<T>) -> Self {
+        Error::Channel(err.to_string())
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::Channel(s) => write!(f, "channel error: {}", s),
         }
-    }
-}
-
-pub struct PoolCreationError;
-
-impl fmt::Display for PoolCreationError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Unable to create thread pool")
-    }
-}
-
-impl fmt::Debug for PoolCreationError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{ file: {}, line: {} }}", file!(), line!())
     }
 }
