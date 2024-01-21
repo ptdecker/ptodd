@@ -10,5 +10,7 @@ pub use error::Error;
 pub use logger::SimpleLogger as Logger;
 pub use server::Server;
 
-/// Defaults
+/// Tread pool size
 const DEFAULT_POOL_SIZE: usize = 4;
+/// Logging level environment variable name
+const LOG_ENV_VAR_NAME: &str = "RUST_LOG";

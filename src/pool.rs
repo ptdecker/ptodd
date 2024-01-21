@@ -6,13 +6,13 @@ use std::{
     thread,
 };
 
+type Job = Box<dyn FnOnce() + Send + 'static>;
+
 #[derive(Debug)]
 pub struct ThreadPool {
     workers: Vec<Worker>,
     sender: Option<mpsc::Sender<Job>>,
 }
-
-type Job = Box<dyn FnOnce() + Send + 'static>;
 
 impl ThreadPool {
     /// Creates a new thread pool
