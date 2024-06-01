@@ -6,3 +6,23 @@ It is built "the hard way" intentionally avoiding third-party crates with a
 preference to implement all capabilities using only the standard library. The
 exception to this is the usage of the [log](https://crates.io/crates/log)
 crate as a facade over the included logging implementation.
+
+
+## Bare EC2 instance setup
+
+```bash
+sudo dnf install git-all
+sudo dnf install golang
+git clone https://github.com/cli/cli.git gh-cli
+cd gh-cli
+make install
+ssh-keygen -t rsa -b 4096 -C "ptdecker@mac.com"
+eval "$(ssh-agent -s)"
+ssh-add /home/ec2-user/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub
+git clone git@github.com:ptdecker/ptodd.git
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+cargo install just
+just build
+```

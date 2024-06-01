@@ -4,7 +4,7 @@
 //! pool to handle incoming connections. It has no third-party crate dependencies.
 //!
 use crate::{pool::ThreadPool, Error, DEFAULT_POOL_SIZE};
-use log::{debug, info};
+use log::{debug, info, warn};
 use std::{
     fs,
     io::{prelude::*, BufReader},
@@ -46,11 +46,16 @@ impl Server {
 }
 
 pub fn handle_connection(mut stream: TcpStream) -> Result<(), Error> {
+    info!("handling a connection");
     let http_request: Vec<_> = BufReader::new(&mut stream)
         .lines()
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
+    if http_request.is_empty() {
+        warn!("Didn't get anything from the connection");
+        return Ok(());
+    }
     info!("{}", http_request[0]);
     debug!("Request ({:?}): {:#?}", stream.peer_addr()?, http_request);
     let (status_line, filename) = match http_request[0].as_str() {
