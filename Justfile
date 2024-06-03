@@ -1,9 +1,20 @@
+# Lint the project
+lint:
+    @cargo fmt
+    @cargo clippy
+
 # Build web site
-build:
-    cargo fmt
-    cargo clippy
-    cargo build
+build: lint
+    @cargo build
 
 # Run the web site from source
-run:
-    cargo run
+run: build
+    @cargo run
+
+# Build the documentation
+build-docs: lint
+    @cargo doc --lib --document-private-items --no-deps
+
+# View the documentation
+docs: build-docs
+    @open target/doc/ptodd/index.html

@@ -85,8 +85,9 @@ impl From<Month> for u8 {
     }
 }
 
+/// System date and time
 #[derive(Debug, Clone, Copy)]
-pub struct SimpleSystemTime {
+pub struct DateTime {
     epoch_seconds: u64,
     epoch_sub_nanoseconds: u32,
     epoch_days: u64,
@@ -96,7 +97,7 @@ pub struct SimpleSystemTime {
     day: u8,
 }
 
-impl fmt::Display for SimpleSystemTime {
+impl fmt::Display for DateTime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let month_num: u8 = self.month.into();
         write!(
@@ -197,9 +198,9 @@ fn month(year: u16, day_of_year: u16) -> (Month, u8) {
     (month, remaining_days as u8)
 }
 
-impl SimpleSystemTime {
+impl DateTime {
     /// Retrieves the current time
-    pub fn now() -> SimpleSystemTime {
+    pub fn now() -> DateTime {
         let now = SystemTime::now();
         let duration = unsafe { now.duration_since(UNIX_EPOCH).unwrap_unchecked() };
         let epoch_seconds = duration.as_secs();
@@ -207,7 +208,7 @@ impl SimpleSystemTime {
         let (year, day_of_year) = year(epoch_days);
         let (month, day) = month(year, day_of_year);
 
-        SimpleSystemTime {
+        DateTime {
             epoch_seconds,
             epoch_sub_nanoseconds: duration.subsec_nanos(),
             epoch_days,
@@ -217,11 +218,31 @@ impl SimpleSystemTime {
             day,
         }
     }
+    /// The year
+    pub fn year(&self) -> u16 {
+        self.year
+    }
+    /// The month
+    pub fn month(&self) -> Month {
+        self.month
+    }
+    /// The day
+    pub fn day(&self) -> u8 {
+        self.day
+    }
+    /// The day of the year
+    pub fn day_of_year(&self) -> u16 {
+        self.day_of_year
+    }
+    /// Is it a leap year
+    pub fn is_leap_year(&self) -> bool {
+        is_leap_year(self.year)
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::time::is_leap_year;
+    use super::*;
 
     // Make sure the leap year function tests
     #[test]

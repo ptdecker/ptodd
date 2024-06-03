@@ -7,7 +7,7 @@
 //!
 //! Log entries are output to stderr
 //!
-use crate::{time::SimpleSystemTime, LOG_ENV_VAR_NAME};
+use crate::{time::DateTime, LOG_ENV_VAR_NAME};
 use log::{set_boxed_logger, set_max_level, LevelFilter, Log, Metadata, Record};
 use std::{
     env::{var, VarError},
@@ -15,11 +15,13 @@ use std::{
     str::FromStr,
 };
 
+/// Simple logger
 pub struct SimpleLogger {
     log_level: LevelFilter,
 }
 
 impl SimpleLogger {
+    /// Initialize the logger
     pub fn init() -> Result<(), Box<dyn Error>> {
         let log_level = match var(LOG_ENV_VAR_NAME) {
             Ok(result) => Ok(result),
@@ -44,7 +46,7 @@ impl Log for SimpleLogger {
         if self.enabled(record.metadata()) {
             eprintln!(
                 "{}: {}: {}: {}",
-                SimpleSystemTime::now(),
+                DateTime::now(),
                 record.level(),
                 record.target(),
                 record.args()
