@@ -9,6 +9,7 @@ pub(crate) mod time;
 pub use error::Error;
 pub use logger::SimpleLogger as Logger;
 pub use server::Server;
+pub use time::SimpleSystemTime;
 
 /// Tread pool size
 const DEFAULT_POOL_SIZE: usize = 4;
