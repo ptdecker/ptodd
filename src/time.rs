@@ -125,7 +125,11 @@ impl fmt::Display for DateTime {
 ///     T    |    F    |    F    |    T    |  2020
 ///     -    |    T    |    F    |    F    |  1900
 ///     -    |    -    |    T    |    T    |  2000
-pub fn is_leap_year(year: u16) -> bool {
+pub fn is_leap_year<T>(year: T) -> bool
+where
+    T: Into<u16>,
+{
+    let year = year.into();
     if year < 1582 || year % 4 != 0 {
         return false;
     }
@@ -136,11 +140,15 @@ pub fn is_leap_year(year: u16) -> bool {
 }
 
 /// Determine the number of days in a month of a given year
-pub fn days_in_month(year: u16, month: Month) -> u8 {
-    match month {
+pub fn days_in_month<T, U>(year: T, month: U) -> u8
+where
+    T: Into<u16>,
+    U: Into<Month>,
+{
+    match month.into() {
         Month::January => 31,
         Month::February => {
-            if is_leap_year(year) {
+            if is_leap_year(year.into()) {
                 29
             } else {
                 28
@@ -162,7 +170,11 @@ pub fn days_in_month(year: u16, month: Month) -> u8 {
 // Determine the year given the number of days since the Unix epoch
 //
 // This calculation is done via brute force by iterating through the years
-fn year(epoch_days: u64) -> (u16, u16) {
+fn year<T>(epoch_days: T) -> (u16, u16)
+where
+    T: Into<u64>,
+{
+    let epoch_days: u64 = epoch_days.into();
     let mut year = 1970u16;
     let mut remaining_days = epoch_days;
     loop {
@@ -184,9 +196,12 @@ fn year(epoch_days: u64) -> (u16, u16) {
 // Determine the month given the day of the year
 //
 // This calculation is done via brute force by iterating through the years
-fn month(year: u16, day_of_year: u16) -> (Month, u8) {
+fn month<T>(year: T, day_of_year: T) -> (Month, u8)
+where
+    T: Into<u16> + Copy,
+{
     let mut month = Month::January;
-    let mut remaining_days = day_of_year;
+    let mut remaining_days: u16 = day_of_year.into();
     loop {
         let days_in_month = days_in_month(year, month) as u16;
         if remaining_days <= days_in_month {
@@ -248,12 +263,12 @@ mod test {
     #[test]
     fn leap_year() {
         // not leap year - div 100 true, div 400 false
-        assert!(!is_leap_year(1900));
+        assert!(!is_leap_year(1900u16));
         // leap year - div 400 true
-        assert!(is_leap_year(2000));
+        assert!(is_leap_year(2000u16));
         // not leap year - div 4 false
-        assert!(!is_leap_year(2019));
+        assert!(!is_leap_year(2019u16));
         // leap year - div 4 true, div 100 false
-        assert!(is_leap_year(2020));
+        assert!(is_leap_year(2020u16));
     }
 }
