@@ -256,7 +256,7 @@ impl DateTime {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     // Make sure the leap year function tests

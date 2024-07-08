@@ -67,6 +67,7 @@ pub fn handle_connection(mut stream: TcpStream) -> Result<(), Error> {
         _ => ("HTTP/1.1 404 NOT FOUND", "404.html"),
     };
     let contents = fs::read_to_string(filename)?;
+    // TODO: Send date in response header (Cf. RFC-9110 6.6.1)
     stream.write_all(
         format!(
             "{status_line}\r\nContent-Length: {}\r\n\r\n{contents}",
