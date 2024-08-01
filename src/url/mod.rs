@@ -1,21 +1,22 @@
+//! A basic URL parser with normalization
+
 // TODO: remove unused linting override
 #![allow(unused)]
 
 use std::str::from_utf8;
 
+use super::*;
+
 pub struct Url {}
 
 // Helper function that converts a character to a byte assuming that it is a hexadecimal character.
 // An error is returned if the character is not '0-9a-fA-F'
-fn hex_char_to_byte(c: char) -> Result<u8, String> {
+fn hex_char_to_byte(c: char) -> Result<u8> {
     match c {
         '0'..='9' => Ok(c as u8 - b'0'),
         'a'..='f' => Ok(c as u8 - b'a' + 10),
         'A'..='F' => Ok(c as u8 - b'A' + 10),
-        _ => Err(format!(
-            "The character '{}' is not a valid hexadecimal digit.",
-            c
-        )),
+        _ => Err(format!("The character '{}' is not a valid hexadecimal digit.", c).into()),
     }
 }
 
@@ -32,12 +33,12 @@ fn pct_encode(uni_char: char) -> String {
 // Helper function that takes a value stored in any type that can be referenced as a str.
 // If it contains an RTF 3986 Percent-Encoding of a valid UTF-8 Unicode character, that
 // character is returned as a char. Otherwise, and error is returned.
-fn pct_decode<S: AsRef<str>>(pct_encoded: S) -> Result<char, String> {
+fn pct_decode<S: AsRef<str>>(pct_encoded: S) -> Result<char> {
     let mut chars = pct_encoded.as_ref().chars().peekable();
     let mut bytes = Vec::<u8>::new();
     while let Some(c) = chars.next() {
         if c != '%' {
-            return Err("expected '%' and didn't find it".to_string());
+            return Err("expected '%' and didn't find it".into());
         }
         let mut next_byte = hex_char_to_byte(
             chars

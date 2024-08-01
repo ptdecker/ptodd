@@ -1,16 +1,17 @@
 //! Simple logger implementation
 //!
+//! Provides an implementation of the ubiquitous Rust [log](https://crates.io/crates/log) facade.
+//!
 //! This logger implementation borrows some code from [simple_logger](https://crates.io/crates/simple_logger)
 //! but is a very bare bones logger implementation that makes assumptions where other full-featured
 //! loggers would provide configuration options. It is included here in keeping with the intent of this
-//! site to minimize (or zero) usage of any third-party crates.
+//! site to minimize to ideally none the usage of any third-party crates.
 //!
 //! Log entries are output to stderr
 //!
 
 use std::{
     env::{var, VarError},
-    result,
     str::FromStr,
 };
 
@@ -18,11 +19,10 @@ use log::{set_boxed_logger, set_max_level, LevelFilter, Log, Metadata, Record};
 
 use crate::time::DateTime;
 
+use super::*;
+
 /// Logging level environment variable name
 const LOG_ENV_VAR_NAME: &str = "RUST_LOG";
-
-pub type Result<T> = result::Result<T, Error>;
-pub type Error = Box<dyn std::error::Error>;
 
 /// Simple logger
 pub struct SimpleLogger {

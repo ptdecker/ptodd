@@ -1,5 +1,10 @@
 //! Provides the backend implementation for the ptodd.org website.
 
+use log::{debug, info, warn};
+
+use logger::SimpleLogger;
+use server::Server;
+
 mod logger;
 mod server;
 mod time;
@@ -11,7 +16,7 @@ pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 fn main() -> Result<()> {
-    logger::SimpleLogger::init()?;
-    server::Server::new(DEFAULT_ADDR)?.run()?;
+    SimpleLogger::init()?;
+    Server::new(DEFAULT_ADDR)?.run()?;
     Ok(())
 }

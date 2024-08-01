@@ -1,4 +1,6 @@
-use std::{fmt, result, sync::mpsc};
+//! Server module custom errors
+
+use super::*;
 
 pub type Result<T> = result::Result<T, Error>;
 

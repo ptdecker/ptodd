@@ -1,9 +1,5 @@
 //! Basic Thread Pool Implementation
 
-use std::sync::{mpsc, Arc, Mutex};
-
-use log::debug;
-
 use super::*;
 
 use self::worker::Worker;

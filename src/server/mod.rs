@@ -4,18 +4,19 @@
 //! pool to handle incoming connections. It has no third-party crate dependencies.
 
 use std::{
-    fs,
+    fmt, fs,
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
+    result,
+    sync::{mpsc, Arc, Mutex},
     thread,
     time::Duration,
 };
 
-use log::{debug, info, warn};
-
+pub use error::{Error, Result};
 use pool::ThreadPool;
 
-pub(crate) use self::error::{Error, Result};
+use super::*;
 
 mod error;
 mod pool;
@@ -64,7 +65,7 @@ impl Server {
     }
 }
 
-pub fn handle_connection(mut stream: TcpStream) -> Result<()> {
+fn handle_connection(mut stream: TcpStream) -> Result<()> {
     info!("handling a connection");
     let http_request: Vec<_> = BufReader::new(&mut stream)
         .lines()

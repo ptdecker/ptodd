@@ -7,9 +7,13 @@
 #![allow(unused)]
 
 use std::{
-    fmt,
+    fmt, result,
     time::{SystemTime, UNIX_EPOCH},
 };
+
+pub use error::{Error, Result};
+
+mod error;
 
 /// Months
 #[derive(Debug, Clone, Copy)]
@@ -47,23 +51,11 @@ impl Month {
     }
 }
 
-// Define an error type for TryFrom
-#[derive(Debug)]
-pub struct InvalidMonthError;
-
-impl fmt::Display for InvalidMonthError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "invalid month value")
-    }
-}
-
-impl std::error::Error for InvalidMonthError {}
-
 // Implement TryFrom<u8> for Month
 impl TryFrom<u8> for Month {
-    type Error = InvalidMonthError;
+    type Error = Error;
 
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
+    fn try_from(value: u8) -> Result<Self> {
         match value {
             1 => Ok(Month::January),
             2 => Ok(Month::February),
@@ -77,7 +69,7 @@ impl TryFrom<u8> for Month {
             10 => Ok(Month::October),
             11 => Ok(Month::November),
             12 => Ok(Month::December),
-            _ => Err(InvalidMonthError),
+            _ => Err(Error::InvalidMonth),
         }
     }
 }
