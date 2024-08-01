@@ -7,7 +7,6 @@ preference to implement all capabilities using only the standard library. The
 exception to this is the usage of the [log](https://crates.io/crates/log)
 crate as a facade over the included logging implementation.
 
-
 ## Bare EC2 instance setup
 
 ```bash
@@ -26,3 +25,11 @@ source "$HOME/.cargo/env"
 cargo install just
 just build
 ```
+
+## Error handling pattern
+
+This repository uses the error handling pattern as discussed in [Jeremy Chone](https://jeremychone.com/)'s
+"[Rust Error Handling--Best Practices](https://www.youtube.com/watch?v=j-VQCYP7wyw)" YouTube video with the omission
+of the usage of the third-party [derive_more](https://jeltef.github.io/derive_more/derive_more/index.html) crate in
+keeping with this project's goal of avoiding third-party crates.
+(Cf. [Error Handling](https://rust10x.com/best-practices/error-handling))
