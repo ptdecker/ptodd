@@ -15,11 +15,13 @@ use std::{
 
 pub use error::{Error, Result};
 use pool::ThreadPool;
+use request::Request;
 
 use super::*;
 
 mod error;
 mod pool;
+mod request;
 mod worker;
 
 /// Tread pool size
@@ -56,9 +58,15 @@ impl Server {
 
     pub fn run(&self) -> Result<()> {
         info!("Listening for connections on {}", &self.addr);
-        for stream in self.listener.incoming() {
-            self.pool
-                .execute(|| handle_connection(stream.unwrap()).unwrap())?;
+        for stream_result in self.listener.incoming() {
+            self.pool.execute(|| match stream_result {
+                Ok(stream) => {
+                    handle_connection(stream).unwrap_or_else(|e| warn!("handle_connection: {}", e))
+                }
+                Err(e) => {
+                    warn!("thread: {}", e);
+                }
+            })?;
         }
         info!("Shutting down");
         Ok(())
@@ -72,11 +80,11 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
-    if http_request.is_empty() {
-        warn!("Didn't get anything from the connection");
-        return Ok(());
-    }
+    let request = Request::parse(&http_request)?;
     info!("{}", http_request[0]);
+    // TODO: Implement display for method and target
+    info!("Method: {:?}", request.method);
+    info!("Target: {:?}", request.target);
     debug!("Request ({:?}): {:#?}", stream.peer_addr()?, http_request);
     let (status_line, filename) = match http_request[0].as_str() {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),

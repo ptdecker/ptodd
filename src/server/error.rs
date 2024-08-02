@@ -6,6 +6,7 @@ pub type Result<T> = result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    InvalidRequest(String),
     Channel(String),
     Io(std::io::Error),
 }
@@ -25,8 +26,9 @@ impl From<std::io::Error> for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::Channel(s) => write!(f, "channel: {}", s),
-            Error::Io(e) => write!(f, "io: {}", e),
+            Error::InvalidRequest(e) => write!(f, "invalid request: {e}"),
+            Error::Channel(s) => write!(f, "channel: {s}"),
+            Error::Io(e) => write!(f, "io: {e}"),
         }
     }
 }

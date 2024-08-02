@@ -7,6 +7,7 @@ use std::str::from_utf8;
 
 use super::*;
 
+#[derive(Default, Debug, Copy, Clone)]
 pub struct Url {}
 
 // Helper function that converts a character to a byte assuming that it is a hexadecimal character.

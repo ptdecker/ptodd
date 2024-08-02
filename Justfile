@@ -11,6 +11,10 @@ build: lint
 run: build
     @cargo run
 
+# Test the web site from source
+test: build
+    @cargo test
+
 # Build the documentation
 build-docs: lint
     @cargo doc --lib --document-private-items --no-deps
