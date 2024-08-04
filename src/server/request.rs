@@ -19,6 +19,22 @@ pub(super) enum RequestMethod {
     Trace,
 }
 
+impl fmt::Display for RequestMethod {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let method_str = match self {
+            RequestMethod::Get => "GET",
+            RequestMethod::Head => "HEAD",
+            RequestMethod::Post => "POST",
+            RequestMethod::Put => "PUT",
+            RequestMethod::Delete => "DELETE",
+            RequestMethod::Connect => "CONNECT",
+            RequestMethod::Options => "OPTIONS",
+            RequestMethod::Trace => "TRACE",
+        };
+        write!(f, "{}", method_str)
+    }
+}
+
 impl TryFrom<&str> for RequestMethod {
     type Error = Error;
     fn try_from(value: &str) -> Result<Self> {
@@ -36,7 +52,7 @@ impl TryFrom<&str> for RequestMethod {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub(super) struct Request {
     // Control Data (RFC-9110 6.2)
     //
@@ -68,7 +84,7 @@ impl Request {
         }
         Ok(Request {
             method: control_data_parts[0].try_into()?,
-            target: Url::default(),
+            target: control_data_parts[1].into(),
         })
     }
 }

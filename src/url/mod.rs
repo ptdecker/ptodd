@@ -3,12 +3,28 @@
 // TODO: remove unused linting override
 #![allow(unused)]
 
-use std::str::from_utf8;
+use std::{fmt, str::from_utf8};
 
 use super::*;
 
-#[derive(Default, Debug, Copy, Clone)]
-pub struct Url {}
+#[derive(Default, Debug, Clone)]
+pub struct Url {
+    raw_path: String,
+}
+
+impl fmt::Display for Url {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", &self.raw_path)
+    }
+}
+
+impl From<&str> for Url {
+    fn from(value: &str) -> Self {
+        Url {
+            raw_path: String::from(value),
+        }
+    }
+}
 
 // Helper function that converts a character to a byte assuming that it is a hexadecimal character.
 // An error is returned if the character is not '0-9a-fA-F'

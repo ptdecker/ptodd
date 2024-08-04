@@ -82,9 +82,8 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         .collect();
     let request = Request::parse(&http_request)?;
     info!("{}", http_request[0]);
-    // TODO: Implement display for method and target
-    info!("Method: {:?}", request.method);
-    info!("Target: {:?}", request.target);
+    info!("Method: {}", request.method);
+    info!("Target: {}", request.target);
     debug!("Request ({:?}): {:#?}", stream.peer_addr()?, http_request);
     let (status_line, filename) = match http_request[0].as_str() {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),
