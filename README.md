@@ -33,3 +33,7 @@ This repository uses the error handling pattern as discussed in [Jeremy Chone](h
 of the usage of the third-party [derive_more](https://jeltef.github.io/derive_more/derive_more/index.html) crate in
 keeping with this project's goal of avoiding third-party crates.
 (Cf. [Error Handling](https://rust10x.com/best-practices/error-handling))
+
+## Learning Resources
+
+* [How Unique Is Your Web Browser](https://share.evernote.com/note/30e0c841-bf39-4d3e-8eb0-ca325a60732a)
